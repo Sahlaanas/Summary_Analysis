@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="stylesheet" href="">
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin: 20px;
+                height:100vh;
+                {% comment %} background: linear-gradient(#ffffff, #ffffff, #3498db); {% endcomment %}
+            }
+    
+            #history {
+                width: 30%;
+                background-color: #f1f1f1;
+                padding: 20px;
+                border-radius: 8px;
+            }
+    
+            #form {
+                width: 65%;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+    
+            form {
+                display: flex;
+                flex-direction: column;
+            }
+    
+            label {
+                margin-bottom: 8px;
+            }
+    
+            input {
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+    
+            button {
+                {% comment %} background-color:linear-gradient(#3498db, #3498db, #3498db); {% endcomment %}
+                background-color: #4caf50;
+                color: white;
+                padding: 10px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+    
+            button:hover {
+                background-color: #45a049;
+            }
+            .remark {
+                font-weight: bold;
+                padding: 5px;
+                border-radius: 5px;
+                display: inline-block;
+            }
+        
+            .good-remark {
+                color: green;
+                {% comment %} background-color: lightgreen; {% endcomment %}
+            }
+            .bad-remark{
+                color: yellow;
+                {% comment %} background-color: lightcoral; {% endcomment %}
+            }
+        
+            .below-remark {
+                color: red;
+                {% comment %} background-color: lightcoral; {% endcomment %}
+            }
+            .average-remark{
+                color: lightgreen;
+                {% comment %} background-color: lightyellow; {% endcomment %}
+            }
+        </style>
+    </head>
+    
+    <body>
+    
+        <div id="history">
+            <h2>Your History</h2>
+            <div class="accordion" id="accordionExample">
+                
+                {% for i in history %}
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      {{i.id}}
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <p>Prompt : {{i.prompttext}}</p><br>
+                      <p>Summary : {{i.summarytext}}</p><br>
+                      <p>Content score : {{i.content}}</p><br>
+                      <p>Wording score : {{i.wording}}</p><br>
+                      <p>Suggestion : {{i.responses}}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+        </div>
+    
+        <div id="form">
+            <h2>Analyse Summary</h2>
+            <form action="result" method="post">
+                {% csrf_token %}
+                <label for="projectName">Prompt Text:</label>
+                <input type="text" id="prompttext" name="prompttext" required>
+    
+                <label for="dataDescription">Summary:</label>
+                <input type="text" id="summarytext" name="summarytext" required>
+    
+                <button type="submit">Analyse</button> 
+            </form>
+            <br>
+            {% if flag %}
+            <p>Inputs are not similar, try some other texts</p>
+            {%else%}
+            {% if datas.content %}
+            <p>Content Score obtained : {{datas.content}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {% if datas.content > 1 %}
+                <span class="remark good-remark">&nbsp;&nbsp;&nbsp;Excellent&nbsp;&nbsp;&nbsp; </span>Keep it up
+            {% elif datas.content > 0.5 and datas.content < 1%}
+                <span class="remark average-remark">&nbsp;&nbsp;&nbsp;Good&nbsp;&nbsp;&nbsp;</span>  Need Improvement
+            {% elif  datas.content > 0 and datas.content < 0.5%}
+                <span class="remark bad-remark">&nbsp;&nbsp;&nbsp;Average&nbsp;&nbsp;&nbsp;</span>  Concentrate more
+                
+            {% else %}
+                <span class="remark below-remark">&nbsp;&nbsp;&nbsp;Below Average&nbsp;&nbsp;&nbsp;</span>  Workout hardly
+                
+            {% endif %}
+            </p>
+            <p>Wording Score obtained : {{datas.wording}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {% if datas.wording > 1 %}
+                <span class="remark good-remark">&nbsp;&nbsp;&nbsp;Excellent </span>Keep it up
+            {% elif datas.wording > 0.5 and datas.wording < 1%}
+                <span class="remark average-remark">&nbsp;&nbsp;&nbsp;Good&nbsp;&nbsp;&nbsp;</span>  Need Improvement
+            {% elif  datas.wording > 0 and datas.wording < 0.5%}
+                <span class="remark bad-remark">&nbsp;&nbsp;&nbsp;Average&nbsp;&nbsp;&nbsp;</span>  Concentrate more
+                
+            {% else %}
+                <span class="remark below-remark">&nbsp;&nbsp;&nbsp;Below Average&nbsp;&nbsp;&nbsp;</span>  Workout hardly
+                
+            {% endif %}</p>
+            <p>Correct it according to the given description:<br></p>
+            <p>{{datas.responses}}</p>
+            {% endif %}
+            {% endif %}
+
+        </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="" async defer></script>
+    </body>
+</html>

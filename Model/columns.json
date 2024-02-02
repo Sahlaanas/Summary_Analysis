@@ -1,0 +1,1 @@
+{"data_columns": ["text_clean", "prompttext_clean", "text_cnt_stopwords", "text_cntpunct", "text_wordcnt", "text_length", "text_syllablecnt", "text_ARI", "text_GFI", "text_cntverb", "text_cntadjctv", "text_cntadvrb", "text_cntnoun", "text_cntpronoun", "text_cntspecificpos", "text_bigram", "text_trigram", "text_misspellcnt", "text_unique", "cos_similarity_text_prompt"]}
